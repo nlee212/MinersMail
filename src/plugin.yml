@@ -1,0 +1,19 @@
+name: BukkitSimulacrum
+main: com.factorynoir.bukkitPlugin.main
+commands:
+    foo:
+        description: Just say 'Foo!'
+        usage: /foo
+    getthetime:
+        description: Get the current time
+        usage: /getthetime
+    vanish:
+        description: Vanish
+        usage: /vanish
+    unvanish:
+        description: Un-Vanish
+        usage: /unvanish
+    newbook:
+        description: Give a player a book...
+        usage: /newbook
+version: 0.1
