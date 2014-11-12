@@ -24,11 +24,12 @@ public class main extends JavaPlugin {
 
 	private final String HELLO_MESSAGE = "Hello world... (this is the example bukkit plugin.)";
 	private final String GOODBYE_MESSAGE = "Goodbye world... (this is the example bukkit plugin.)";
+	private MailServer ms;
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
-		getLogger().info("Inside onCommand");
+		
 		
 		if (cmd.getLabel().startsWith("m")) 
 		{
@@ -43,51 +44,39 @@ public class main extends JavaPlugin {
 			{
 				message = message + cmd.getLabel().charAt(i);
 			}
-			getLogger().info(username);
-			sender.sendMessage("Send to: " + username + "\nMessage: " + message);
 			
-			ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-			BookMeta meta = (BookMeta) book.getItemMeta();
-			meta.setTitle("Message For: " + username );
-			meta.setAuthor(sender.getName());
-			meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + message));
-
-			book.setItemMeta(meta);
-			
+			sender.sendMessage("Message sent?: " + ms.sendMail(sender.getName(), username, message));		
 			
 			
 			return true;
 		}
 		else if (cmd.getName().equalsIgnoreCase("get_m"))
 		{
-			sender.getName();
-			sender.sendMessage("The time");
+			String currentUser = sender.getName();
+			
+			MailNode myMail = ms.getMail(currentUser);
+			
+			while( myMail.isNotPlaceHolder() )
+			{
+				ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+				BookMeta meta = (BookMeta) book.getItemMeta();
+				meta.setTitle("Message From: " + myMail.getSender() );
+				meta.setAuthor(myMail.getSender());
+				meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
+
+				book.setItemMeta(meta);
+				
+				Player player = (Player) sender;
+				
+				player.getInventory().addItem(book);
+				
+				myMail = myMail.getNext();
+			}
 		}
 		else if (cmd.getName().equalsIgnoreCase("m_help"))
 		{
 			sender.sendMessage("/m (recipient) (message)");
 			sender.sendMessage("");
-		}
-		
-		if (sender instanceof Player) {
-			Player player = (Player) sender;
-			
-			if (cmd.getLabel().equalsIgnoreCase("vanish")) {
-				player.hidePlayer(player);
-			} else if (cmd.getLabel().equalsIgnoreCase("unvanish")) {
-				player.showPlayer(player);
-			} else if (cmd.getLabel().equals("newbook")) {
-				ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-				BookMeta meta = (BookMeta) book.getItemMeta();
-				meta.setTitle("Simulacra and Simulation");
-				meta.setAuthor("Jean Baudrillard");
-				meta.setPages(Arrays.asList(ChatColor.GREEN + "The simulacrum is never what hids the truth -- it is truth that hides the fact that there is none. The simulacrum is true. -- Ecclesiastes."));
-
-				book.setItemMeta(meta);
-				
-				player.getInventory().addItem(book);
-				
-			}
 		}
 		return true;
 	}
@@ -98,7 +87,7 @@ public class main extends JavaPlugin {
 	@Override
 	public void onEnable ()
 	{
-		getLogger().info (HELLO_MESSAGE);
+		ms = new MailServer();
 	}
 	
 	@Override
@@ -134,3 +123,18 @@ public class main extends JavaPlugin {
      
     }
 }
+/*
+ * 
+ * 
+ * 
+ * sender.sendMessage("Send to: " + username + "\nMessage: " + message);
+			
+			ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+			BookMeta meta = (BookMeta) book.getItemMeta();
+			meta.setTitle("Message For: " + username );
+			meta.setAuthor(sender.getName());
+			meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + message));
+
+			book.setItemMeta(meta);
+
+*/
