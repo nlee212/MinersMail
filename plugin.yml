@@ -1,0 +1,11 @@
+name: MinersMail
+main: com.nicholaslee.testerPlugin.main
+version: 1.0
+
+commands:
+	m:
+		description: thakns
+	m_get:
+		description: me 2
+	m_help:
+		description: saem
