@@ -1,9 +1,5 @@
 package com.nicholaslee.testerPlugin;
 
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.Arrays;
 import java.io.File;
 import java.io.FileWriter;
@@ -18,6 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 
 public class main extends JavaPlugin {
@@ -49,7 +49,7 @@ public class main extends JavaPlugin {
 			
 			return true;
 		}
-		else if (cmd.getName().equalsIgnoreCase("get_m"))
+		else if (cmd.getName().equalsIgnoreCase("m_get"))
 		{
 			String currentUser = sender.getName();
 			
@@ -64,9 +64,7 @@ public class main extends JavaPlugin {
 				meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
 
 				book.setItemMeta(meta);
-				
 				Player player = (Player) sender;
-				
 				player.getInventory().addItem(book);
 				
 				myMail = myMail.getNext();
@@ -84,29 +82,28 @@ public class main extends JavaPlugin {
 		return true;
 	}
 	
-	/* onEnable and onDisable get invoked when the server is started up, shut down, restarted... 
-	 * In the console try doing a /reload 
-	 */
-	public void onLogin(PlayerLoginEvent event) 
-	{
-	
-	   if( ms.hasMail(event.getHostName()) )
-	   {
-		   playerJoined = event.getPlayer();
-		   playerJoined.sendMessage("You have mail " );
-		   
-	   }
-	   else
-	   {
-		   
-		   playerJoined = event.getPlayer();
-		   playerJoined.sendMessage("You have no mail sucks to suck... No one wants to talk to you." );
-	   }
+
+	public final class LoginListener implements Listener{
+		@EventHandler
+		public void onLogin(PlayerLoginEvent event) 
+		{
+			Player playerJoined = event.getPlayer();
+			String user = playerJoined.getDisplayName();
+			if(ms.hasMail(user)){
+				playerJoined.sendMessage("u hav new mail");
+			}
+			else{
+				playerJoined.sendMessage("u hav no new mail");
+			}
+		}
 	}
+	
+	
 	@Override
 	public void onEnable ()
 	{
 		ms = new MailServer();
+		getServer().getPluginManager().registerEvents(new LoginListener(), this);
 	}
 	
 	@Override

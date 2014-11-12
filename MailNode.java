@@ -34,6 +34,10 @@ public class MailNode{
 		return messageBody != null && sender != null;
 	}
 	
+	public boolean hasNext(){
+		return next != null;
+	}
+	
 	public MailNode getNext(){
 		return next;
 	}

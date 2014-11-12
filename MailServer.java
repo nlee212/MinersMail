@@ -24,12 +24,16 @@ public class MailServer {
 	}
 	
 	/**
-	 * Determine if the given user has mail. Also usable to see if the user has a mailbox.
+	 * Determine if the given user had a mailbox
 	 * @param user the given user
 	 * @return  True if the given user has a mailbox and has at least one unclaimed message, false otherwise
 	 */
 	public boolean hasMail(String user){
-		return (mailboxes.containsKey(user) && mailboxes.get(user).isNotPlaceHolder()); 
+		if(!mailboxes.containsKey(user)){
+			mailboxes.put(user, PLACEHOLDER);
+			return false;
+		}
+		return mailboxes.get(user).isNotPlaceHolder();
 	}
 	
 	/**
@@ -47,11 +51,13 @@ public class MailServer {
 		
 	}
 	
+
+	
 	/**
 	 * do da dansing
-	 * @param sender
-	 * @param recipient
-	 * @param message
+	 * @param sender the sender of the mail
+	 * @param recipient the recpient of the mail
+	 * @param message the message to send
 	 * @return
 	 */
 	public boolean sendMail(String sender, String recipient, String message){
