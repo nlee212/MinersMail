@@ -27,9 +27,8 @@ public class main extends JavaPlugin {
 	private MailServer ms;
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		
-		
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
+	{
 		
 		if (cmd.getLabel().startsWith("m")) 
 		{
@@ -76,7 +75,11 @@ public class main extends JavaPlugin {
 		else if (cmd.getName().equalsIgnoreCase("m_help"))
 		{
 			sender.sendMessage("/m (recipient) (message)");
-			sender.sendMessage("");
+			sender.sendMessage("This command will create a new message to the intended recipient.");
+			sender.sendMessage("/m_get");
+			sender.sendMessage("This command will get the user's email when they log in.");
+			sender.sendMessage("/m_help");
+			sender.sendMessage("This command will get you help.");
 		}
 		return true;
 	}
@@ -84,6 +87,20 @@ public class main extends JavaPlugin {
 	/* onEnable and onDisable get invoked when the server is started up, shut down, restarted... 
 	 * In the console try doing a /reload 
 	 */
+	public void onLogin(PlayerLoginEvent event) 
+	{
+	
+	   if( ms.hasMail(event.getHostName()) )
+	   {
+		   playerJoined = event.getPlayer();
+		   playerJoined.sendMessage("Message, "+ playerJoined.getName());
+		   
+	   }
+	   else
+	   {
+		   //create mailbox
+	   }
+	}
 	@Override
 	public void onEnable ()
 	{
