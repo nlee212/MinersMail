@@ -93,12 +93,14 @@ public class main extends JavaPlugin {
 	   if( ms.hasMail(event.getHostName()) )
 	   {
 		   playerJoined = event.getPlayer();
-		   playerJoined.sendMessage("Message, "+ playerJoined.getName());
+		   playerJoined.sendMessage("You have mail " );
 		   
 	   }
 	   else
 	   {
-		   //create mailbox
+		   
+		   playerJoined = event.getPlayer();
+		   playerJoined.sendMessage("You have no mail sucks to suck... No one wants to talk to you." );
 	   }
 	}
 	@Override
