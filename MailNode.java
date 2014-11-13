@@ -28,6 +28,9 @@ public class MailNode{
 	
 	public MailNode(String messageBody, String sender, MailNode next, Timestamp timestamp){
 		this.messageBody = messageBody;
+		this.sender = sender;
+		this.next = next;
+		this.timestamp = timestamp;
 	}
 	
 	public boolean isNotPlaceHolder(){

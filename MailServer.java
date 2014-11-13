@@ -14,6 +14,12 @@ public class MailServer {
 	 * @param user the user to create a mailbox for
 	 * @return true if creation is successful, false otherwise
 	 */
+	
+	public MailServer(){
+		mailboxes = new HashMap<String, MailNode>();
+		
+	}
+	
 	public boolean createInbox(String user){
 		if(!mailboxes.containsKey(user)){
 			mailboxes.put(user, PLACEHOLDER);
@@ -28,13 +34,15 @@ public class MailServer {
 	 * @param user the given user
 	 * @return  True if the given user has a mailbox and has at least one unclaimed message, false otherwise
 	 */
-	public boolean hasMail(String user){
+	public boolean hasInbox(String user){
 		if(!mailboxes.containsKey(user)){
 			mailboxes.put(user, PLACEHOLDER);
 			return false;
 		}
-		return mailboxes.get(user).isNotPlaceHolder();
+		return true;
 	}
+	
+	
 	
 	/**
 	 * Gets the mail for the given user and empties their mailbox
@@ -42,7 +50,7 @@ public class MailServer {
 	 * @return returns the first message in the user's inbox, or a placeholder if their mailbox was empty.
 	 */
 	public MailNode getMail(String user){
-		if(hasMail(user)){
+		if(mailboxes.containsKey(user)){
 			MailNode m = mailboxes.get(user);
 			mailboxes.put(user, PLACEHOLDER);
 			return m;

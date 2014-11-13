@@ -16,13 +16,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 
 public class main extends JavaPlugin {
 
-	private final String HELLO_MESSAGE = "Hello world... (this is the example bukkit plugin.)";
+
 	private final String GOODBYE_MESSAGE = "Goodbye world... (this is the example bukkit plugin.)";
 	private MailServer ms;
 	
@@ -30,47 +29,45 @@ public class main extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
 	{
 		
-		if (cmd.getLabel().startsWith("m")) 
+		if (cmd.getLabel().startsWith("m") && args.length > 1) //need to come up with a better way to catch msgs
 		{
-			int i = 2;
-			String username = "";
 			String message = "";
-			while( i < 17 && cmd.getLabel().charAt(i) != ' ' )
-			{
-				username = username + cmd.getLabel().charAt(i);
-			}
-			while(i < cmd.getLabel().length())
-			{
-				message = message + cmd.getLabel().charAt(i);
+					
+			for(int i = 1; i < args.length; i++){
+				message += args[i]+" ";
 			}
 			
-			sender.sendMessage("Message sent?: " + ms.sendMail(sender.getName(), username, message));		
+			sender.sendMessage("Message sent?: " + ms.sendMail(sender.getName(), args[0], message));		
 			
-			
-			return true;
 		}
-		else if (cmd.getName().equalsIgnoreCase("m_get"))
+		else if (cmd.getLabel().equalsIgnoreCase("m_get"))
 		{
 			String currentUser = sender.getName();
-			
+		
 			MailNode myMail = ms.getMail(currentUser);
+			
+	
 			
 			while( myMail.isNotPlaceHolder() )
 			{
+				
 				ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 				BookMeta meta = (BookMeta) book.getItemMeta();
+				
+				
 				meta.setTitle("Message From: " + myMail.getSender() );
 				meta.setAuthor(myMail.getSender());
 				meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
-
 				book.setItemMeta(meta);
+				
 				Player player = (Player) sender;
 				player.getInventory().addItem(book);
 				
 				myMail = myMail.getNext();
 			}
 		}
-		else if (cmd.getName().equalsIgnoreCase("m_help"))
+		
+		else if (cmd.getLabel().equalsIgnoreCase("m_help"))
 		{
 			sender.sendMessage("/m (recipient) (message)");
 			sender.sendMessage("This command will create a new message to the intended recipient.");
@@ -85,16 +82,18 @@ public class main extends JavaPlugin {
 
 	public final class LoginListener implements Listener{
 		@EventHandler
-		public void onLogin(PlayerLoginEvent event) 
+		public void onLogin(PlayerJoinEvent event) 
 		{
 			Player playerJoined = event.getPlayer();
 			String user = playerJoined.getDisplayName();
-			if(ms.hasMail(user)){
+			if(ms.hasInbox(user)){
 				playerJoined.sendMessage("u hav new mail");
 			}
 			else{
 				playerJoined.sendMessage("u hav no new mail");
 			}
+			
+			
 		}
 	}
 	
@@ -102,6 +101,7 @@ public class main extends JavaPlugin {
 	@Override
 	public void onEnable ()
 	{
+		getLogger().info ("HERRO");
 		ms = new MailServer();
 		getServer().getPluginManager().registerEvents(new LoginListener(), this);
 	}
