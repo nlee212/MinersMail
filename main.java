@@ -28,7 +28,7 @@ public class main extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
 	{
-		
+		String currentUser = sender.getName();
 		if (cmd.getLabel().startsWith("m") && args.length > 1) //need to come up with a better way to catch msgs
 		{
 			String message = "";
@@ -36,18 +36,25 @@ public class main extends JavaPlugin {
 			for(int i = 1; i < args.length; i++){
 				message += args[i]+" ";
 			}
-			
-			sender.sendMessage("Message sent?: " + ms.sendMail(sender.getName(), args[0], message));		
+			if( ms.sendMail(sender.getName(), args[0], message)){
+				sender.sendMessage("Message sent!");
+				getLogger().info (sender.getName()+" sent mail to "+args[0]);
+			}
+			else{
+				sender.sendMessage("Mail not sent");
+				getLogger().info ("Mail Failed");
+			}
+					
 			
 		}
 		else if (cmd.getLabel().equalsIgnoreCase("m_get"))
 		{
-			String currentUser = sender.getName();
+			
 		
 			MailNode myMail = ms.getMail(currentUser);
 			
 	
-			
+			int mailCount = 0;
 			while( myMail.isNotPlaceHolder() )
 			{
 				
@@ -64,7 +71,9 @@ public class main extends JavaPlugin {
 				player.getInventory().addItem(book);
 				
 				myMail = myMail.getNext();
+				mailCount++;
 			}
+			getLogger().info (currentUser +" retrieved " + mailCount + "messages");
 		}
 		
 		else if (cmd.getLabel().equalsIgnoreCase("m_help"))
@@ -101,7 +110,7 @@ public class main extends JavaPlugin {
 	@Override
 	public void onEnable ()
 	{
-		getLogger().info ("HERRO");
+		getLogger().info ("Starting MinersMail");
 		ms = new MailServer();
 		getServer().getPluginManager().registerEvents(new LoginListener(), this);
 	}
