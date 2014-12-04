@@ -108,7 +108,7 @@ public class main extends JavaPlugin {
 		{
 			Player playerJoined = event.getPlayer();
 			String user = playerJoined.getDisplayName();
-			if(ms.hasInbox(user)){
+			if(ms.onLogin(user)){
 				playerJoined.sendMessage("u hav new mail");
 			}
 			else{
