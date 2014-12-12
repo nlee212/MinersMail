@@ -30,15 +30,16 @@ public class MailServer {
 	}
 	
 	/**
-	 * Method to be called whenever a user logs in. Creates an inbox if the user doesnt already have one
+	 * Determine if the given user had a mailbox
 	 * @param user the given user
-	 * @return  True has at least one unclaimed message, false otherwise
+	 * @return  True if the given user has a mailbox and has at least one unclaimed message, false otherwise
 	 */
-	public boolean onLogin(String user){
+	public boolean hasInbox(String user){
 		if(!mailboxes.containsKey(user)){
 			mailboxes.put(user, PLACEHOLDER);
+			return false;
 		}
-		return mailboxes.get(user).isNotPlaceHolder();
+		return true;
 	}
 	
 	
