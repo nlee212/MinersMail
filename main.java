@@ -24,6 +24,7 @@ public class main extends JavaPlugin {
 
 	private final String GOODBYE_MESSAGE = "Goodbye world... (this is the example bukkit plugin.)";
 	private MailServer ms;
+	private final int MAX_INVENTORY_IN_SURVIVAL_MODE = 27;
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
@@ -55,25 +56,37 @@ public class main extends JavaPlugin {
 			
 	
 			int mailCount = 0;
-			while( myMail.isNotPlaceHolder() )
+			//To get current player instance
+			Player player = (Player) sender;
+			
+			int currentInventorySize = player.getInventory().getSize();//get player current inventory size
+			
+			if(currentInventorySize < MAX_INVENTORY_IN_SURVIVAL_MODE)//if enough space then get mail
 			{
-				
-				ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-				BookMeta meta = (BookMeta) book.getItemMeta();
-				
-				
-				meta.setTitle("Message From: " + myMail.getSender() );
-				meta.setAuthor(myMail.getSender());
-				meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
-				book.setItemMeta(meta);
-				
-				Player player = (Player) sender;
-				player.getInventory().addItem(book);
-				
-				myMail = myMail.getNext();
-				mailCount++;
+				while( myMail.isNotPlaceHolder() )
+				{
+					
+					ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+					BookMeta meta = (BookMeta) book.getItemMeta();
+					
+					
+					meta.setTitle("Message From: " + myMail.getSender() );
+					meta.setAuthor(myMail.getSender());
+					meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
+					book.setItemMeta(meta);
+					
+					
+					player.getInventory().addItem(book);
+					
+					myMail = myMail.getNext();
+					mailCount++;
+				}
+				getLogger().info (currentUser +" retrieved " + mailCount + "messages");
 			}
-			getLogger().info (currentUser +" retrieved " + mailCount + "messages");
+			else
+			{
+				getLogger().info (currentUser +" No more space in your inventory.");
+			}
 		}
 		
 		else if (cmd.getLabel().equalsIgnoreCase("m_help"))
