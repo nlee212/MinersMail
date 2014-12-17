@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,42 +53,37 @@ public class main extends JavaPlugin {
 		else if (cmd.getLabel().equalsIgnoreCase("m_get"))
 		{
 			
-		
+			Player player = (Player) sender;
 			MailNode myMail = ms.getMail(currentUser);
 			
 	
-			int mailCount = 0;
+			int remaining = MAX_INVENTORY_IN_SURVIVAL_MODE - player.getInventory().getSize();
 			//To get current player instance
-			Player player = (Player) sender;
 			
-			int currentInventorySize = player.getInventory().getSize();//get player current inventory size
 			
-			if(currentInventorySize < MAX_INVENTORY_IN_SURVIVAL_MODE)//if enough space then get mail
+			//get player current inventory size
+			
+			
+			while( myMail.isNotPlaceHolder() && remaining > 0)
 			{
-				while( myMail.isNotPlaceHolder() )
-				{
-					
-					ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-					BookMeta meta = (BookMeta) book.getItemMeta();
-					
-					
-					meta.setTitle("Message From: " + myMail.getSender() );
-					meta.setAuthor(myMail.getSender());
-					meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
-					book.setItemMeta(meta);
-					
-					
-					player.getInventory().addItem(book);
-					
-					myMail = myMail.getNext();
-					mailCount++;
-				}
-				getLogger().info (currentUser +" retrieved " + mailCount + "messages");
+				
+				ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+				BookMeta meta = (BookMeta) book.getItemMeta();
+				
+				
+				meta.setTitle("Message From: " + myMail.getSender() );
+				meta.setAuthor(myMail.getSender());
+				meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
+				book.setItemMeta(meta);
+				
+				
+				player.getInventory().addItem(book);
+				remaining--;
+				myMail = myMail.getNext();
 			}
-			else
-			{
-				getLogger().info (currentUser +" No more space in your inventory.");
-			}
+			ms.PutMail(currentUser, myMail);
+					
+		
 		}
 		
 		else if (cmd.getLabel().equalsIgnoreCase("m_help"))
@@ -108,11 +105,11 @@ public class main extends JavaPlugin {
 		{
 			Player playerJoined = event.getPlayer();
 			String user = playerJoined.getDisplayName();
-			if(ms.hasInbox(user)){
-				playerJoined.sendMessage("u hav new mail");
+			if(ms.onLogin(user)){
+				playerJoined.sendMessage("New Mail!");
 			}
 			else{
-				playerJoined.sendMessage("u hav no new mail");
+				playerJoined.sendMessage("No New Mail");
 			}
 			
 			
@@ -124,13 +121,28 @@ public class main extends JavaPlugin {
 	public void onEnable ()
 	{
 		getLogger().info ("Starting MinersMail");
-		ms = new MailServer();
+	      try
+	      {
+	         FileInputStream fileIn = new FileInputStream("MailServer.ser");
+	         ObjectInputStream in = new ObjectInputStream(fileIn);
+	         ms = (MailServer) in.readObject();
+	         in.close();
+	         fileIn.close();
+	         getLogger().info("Loaded MailServer From File");
+		}catch(Exception e){
+			ms = new MailServer();
+			getLogger().info("New MailServer Created");
+		}
+		
+		
+		
 		getServer().getPluginManager().registerEvents(new LoginListener(), this);
 	}
 	
 	@Override
 	public void onDisable ()
 	{
+		ms.writeToFile();
 		getLogger().info (GOODBYE_MESSAGE);
 	}
 	

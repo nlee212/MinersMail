@@ -1,6 +1,7 @@
 package com.nicholaslee.testerPlugin;
 
 import java.sql.Timestamp;
+import java.io.Serializable;
 
 
 /**
@@ -10,7 +11,7 @@ import java.sql.Timestamp;
  * @author Nicholas
  *
  */
-public class MailNode{
+public class MailNode implements Serializable{
 	private String messageBody;
 	private String sender;
 	private MailNode next;

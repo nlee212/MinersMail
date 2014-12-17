@@ -1,11 +1,15 @@
 package com.nicholaslee.testerPlugin;
 
 import java.util.HashMap;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
 
-
-public class MailServer {
+public class MailServer implements Serializable{
 	private static final MailNode PLACEHOLDER = new MailNode();
 	private HashMap<String, MailNode> mailboxes;
 
@@ -18,6 +22,22 @@ public class MailServer {
 	public MailServer(){
 		mailboxes = new HashMap<String, MailNode>();
 		
+	}
+	
+	public void writeToFile(){
+		
+		
+		 try
+	      {
+	         FileOutputStream fileOut = new FileOutputStream("MailServer.ser");
+	         ObjectOutputStream out = new ObjectOutputStream(fileOut);
+	         out.writeObject(this);
+	         out.close();
+	         fileOut.close();
+	      }catch(IOException i)
+	      {
+	          i.printStackTrace();
+	      }
 	}
 	
 	public boolean createInbox(String user){
@@ -34,7 +54,7 @@ public class MailServer {
 	 * @param user the given user
 	 * @return  True if the given user has a mailbox and has at least one unclaimed message, false otherwise
 	 */
-	public boolean hasInbox(String user){
+	public boolean onLogin(String user){
 		if(!mailboxes.containsKey(user)){
 			mailboxes.put(user, PLACEHOLDER);
 			return false;
@@ -50,6 +70,7 @@ public class MailServer {
 	 * @return returns the first message in the user's inbox, or a placeholder if their mailbox was empty.
 	 */
 	public MailNode getMail(String user){
+		
 		if(mailboxes.containsKey(user)){
 			MailNode m = mailboxes.get(user);
 			mailboxes.put(user, PLACEHOLDER);
@@ -57,6 +78,11 @@ public class MailServer {
 		}
 		return PLACEHOLDER;
 		
+	}
+	
+	public void PutMail(String user, MailNode m){
+		if(mailboxes.containsKey(user))
+			mailboxes.put(user, m);
 	}
 	
 
