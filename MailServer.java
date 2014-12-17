@@ -5,28 +5,25 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 
 public class MailServer implements Serializable{
+	
 	private static final MailNode PLACEHOLDER = new MailNode();
 	private HashMap<String, MailNode> mailboxes;
 
 	/**
-	 * Creates a mailbox for the given user
-	 * @param user the user to create a mailbox for
-	 * @return true if creation is successful, false otherwise
+	 * Creates a new MailServer with no users or mail
 	 */
-	
 	public MailServer(){
 		mailboxes = new HashMap<String, MailNode>();
-		
 	}
 	
+	/**
+	 * Serialize the current MailServer
+	 */
 	public void writeToFile(){
-		
-		
 		 try
 	      {
 	         FileOutputStream fileOut = new FileOutputStream("MailServer.ser");
@@ -40,26 +37,19 @@ public class MailServer implements Serializable{
 	      }
 	}
 	
-	public boolean createInbox(String user){
-		if(!mailboxes.containsKey(user)){
-			mailboxes.put(user, PLACEHOLDER);
-			return true;
-		}
-		return false;
-		
-	}
 	
 	/**
-	 * Determine if the given user had a mailbox
+	 * Action to be performed whenever a user logs in. Creates an inbox for new users and
+	 * returns whether or not the given user has any unclaimed mail
 	 * @param user the given user
-	 * @return  True if the given user has a mailbox and has at least one unclaimed message, false otherwise
+	 * @return  True if the given user has at least one unclaimed message, false otherwise
 	 */
 	public boolean onLogin(String user){
 		if(!mailboxes.containsKey(user)){
 			mailboxes.put(user, PLACEHOLDER);
 			return false;
 		}
-		return true;
+		return mailboxes.get(user).isNotPlaceHolder();
 	}
 	
 	
@@ -77,18 +67,23 @@ public class MailServer implements Serializable{
 			return m;
 		}
 		return PLACEHOLDER;
-		
 	}
 	
-	public void PutMail(String user, MailNode m){
+	
+	/**
+	 * Used to place arbitrary mail back into the system for the given user. 
+	 * Needed due to inventory constraints
+	 * @param user the given user
+	 * @param m the MailNode to place into the given user's inbox
+	 */
+	public void putMail(String user, MailNode m){
 		if(mailboxes.containsKey(user))
 			mailboxes.put(user, m);
 	}
 	
-
 	
 	/**
-	 * do da dansing
+	 * Send mail from one player to another
 	 * @param sender the sender of the mail
 	 * @param recipient the recpient of the mail
 	 * @param message the message to send
@@ -103,5 +98,4 @@ public class MailServer implements Serializable{
 		}
 		return false;
 	}
-	
 }

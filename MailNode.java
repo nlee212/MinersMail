@@ -27,6 +27,13 @@ public class MailNode implements Serializable{
 		timestamp = null;
 	}
 	
+	/**
+	 * Creates a MailNode based on the given parameters
+	 * @param messageBody the message to be contained in the mail
+	 * @param sender the name of the person who sent the mail
+	 * @param next the next MailNode in the sequence. 
+	 * @param timestamp the SQL Timestamp for when the message was created
+	 */
 	public MailNode(String messageBody, String sender, MailNode next, Timestamp timestamp){
 		this.messageBody = messageBody;
 		this.sender = sender;

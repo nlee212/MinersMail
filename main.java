@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
-
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
@@ -23,10 +21,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class main extends JavaPlugin {
 
-
-	private final String GOODBYE_MESSAGE = "Goodbye world... (this is the example bukkit plugin.)";
 	private MailServer ms;
-	private final int MAX_INVENTORY_IN_SURVIVAL_MODE = 27;
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) 
@@ -52,38 +47,26 @@ public class main extends JavaPlugin {
 		}
 		else if (cmd.getLabel().equalsIgnoreCase("m_get"))
 		{
-			
 			Player player = (Player) sender;
 			MailNode myMail = ms.getMail(currentUser);
-			
-	
-			int remaining = MAX_INVENTORY_IN_SURVIVAL_MODE - player.getInventory().getSize();
-			//To get current player instance
-			
-			
-			//get player current inventory size
-			
-			
-			while( myMail.isNotPlaceHolder() && remaining > 0)
+					
+			while( myMail.isNotPlaceHolder() )
 			{
-				
+				int nextIndex = player.getInventory().firstEmpty();
+				if(nextIndex == -1){ //no available spaces
+					sender.sendMessage("Insufficient inventory space for remaining mail");
+					break;
+				}
 				ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 				BookMeta meta = (BookMeta) book.getItemMeta();
-				
-				
-				meta.setTitle("Message From: " + myMail.getSender() );
+				meta.setTitle(myMail.getTimestamp().toString() );
 				meta.setAuthor(myMail.getSender());
-				meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + myMail.getMessageBody()));
-				book.setItemMeta(meta);
-				
-				
-				player.getInventory().addItem(book);
-				remaining--;
+				meta.setPages(Arrays.asList(myMail.getMessageBody()));
+				book.setItemMeta(meta);		
+				player.getInventory().setItem(nextIndex,book);
 				myMail = myMail.getNext();
 			}
-			ms.PutMail(currentUser, myMail);
-					
-		
+			ms.putMail(currentUser, myMail);		
 		}
 		
 		else if (cmd.getLabel().equalsIgnoreCase("m_help"))
@@ -143,7 +126,6 @@ public class main extends JavaPlugin {
 	public void onDisable ()
 	{
 		ms.writeToFile();
-		getLogger().info (GOODBYE_MESSAGE);
 	}
 	
     public void logToFile(String message)
@@ -173,18 +155,3 @@ public class main extends JavaPlugin {
      
     }
 }
-/*
- * 
- * 
- * 
- * sender.sendMessage("Send to: " + username + "\nMessage: " + message);
-			
-			ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-			BookMeta meta = (BookMeta) book.getItemMeta();
-			meta.setTitle("Message For: " + username );
-			meta.setAuthor(sender.getName());
-			meta.setPages(Arrays.asList(ChatColor.GREEN + "Message: " + message));
-
-			book.setItemMeta(meta);
-
-*/
